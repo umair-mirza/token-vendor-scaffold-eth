@@ -16,6 +16,11 @@ module.exports = async ({ getNamedAccounts, deployments, getChainId }) => {
 
   const yourToken = await ethers.getContract("YourToken", deployer);
 
+  const result = await yourToken.transfer(
+    "0x54c105db676C88D95AFd4F28b37983bE1dfcB735",
+    ethers.utils.parseEther("1000")
+  );
+
   // Todo: transfer tokens to frontend address
   // const result = await yourToken.transfer("0x18fFE4dADcCe63A074Ef9cfe327cAb9AD4Ad9f76", ethers.utils.parseEther("1000") );
 
