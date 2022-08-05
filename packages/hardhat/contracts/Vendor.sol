@@ -40,9 +40,33 @@ contract Vendor is Ownable {
   // ToDo: create a withdraw() function that lets the owner withdraw ETH
 
   function withdraw() public onlyOwner {
-    payable(msg.sender).transfer(address(this).balance);
+    //Get the amount of Eth stored in this contract
+    uint256 amount = address(this).balance;
+
+    (bool success, ) = payable(msg.sender).call{value: amount}("");
+    require(success, "Failed to send Ether");
+
   }
 
   // ToDo: create a sellTokens(uint256 _amount) function:
+
+  function sellTokens(uint256 _amount) public {
+    
+    //Check if the user has enough coins to sell
+    uint256 ownerBalance = yourToken.balanceOf(msg.sender);
+    require(ownerBalance >= _amount, "Your balance is less than the amount you want to sell");
+
+    //Check if the Vendor contract has enough Eth to pay
+    uint256 amountOfEth = _amount / tokensPerEth;
+    require(address(this).balance >= amountOfEth, "Vendor does not have enough Eth to purchase the coins");
+
+    //After getting approval, Vendor contract will call transferFrom
+    (bool success) = yourToken.transferFrom(msg.sender, address(this), _amount);
+    require(success, "transaction failed");
+
+    //Send the Eth to user
+    (bool sent, ) = msg.sender.call{value: amountOfEth}("");
+    require(sent, "Failed to send Eth to user");
+  }
 
 }
